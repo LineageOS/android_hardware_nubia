@@ -13,6 +13,7 @@
 #include <hardware/hardware.h>
 #include <hardware/fingerprint.h>
 #include "BiometricsFingerprint.h"
+#include "UdfpsHandler.h"
 
 #include <inttypes.h>
 #include <unistd.h>
@@ -47,7 +48,11 @@ using RequestStatus = android::hardware::biometrics::fingerprint::V2_1::RequestS
 using ::android::base::StartsWith;
 BiometricsFingerprint* BiometricsFingerprint::sInstance = nullptr;
 
-BiometricsFingerprint::BiometricsFingerprint() : mClientCallback(nullptr), mDevice(nullptr) {
+BiometricsFingerprint::BiometricsFingerprint()
+    : mClientCallback(nullptr),
+      mDevice(nullptr),
+      mUdfpsHandlerFactory(nullptr),
+      mUdfpsHandler(nullptr) {
     sInstance = this;  // keep track of the most recent instance
     for (auto& [id_name, class_name, is_udfps] : kModules) {
         mDevice = openHal(id_name, class_name);
@@ -63,10 +68,27 @@ BiometricsFingerprint::BiometricsFingerprint() : mClientCallback(nullptr), mDevi
     if (!mDevice) {
         ALOGE("Can't open any HAL module");
     }
+
+    if (mIsUdfps) {
+        mUdfpsHandlerFactory = getUdfpsHandlerFactory();
+        if (!mUdfpsHandlerFactory) {
+            ALOGE("Can't get UdfpsHandlerFactory");
+        } else {
+            mUdfpsHandler = mUdfpsHandlerFactory->create();
+            if (!mUdfpsHandler) {
+                ALOGE("Can't create UdfpsHandler");
+            } else {
+                mUdfpsHandler->init(mDevice);
+            }
+        }
+    }
 }
 
 BiometricsFingerprint::~BiometricsFingerprint() {
     ALOGV("~BiometricsFingerprint()");
+    if (mUdfpsHandler) {
+        mUdfpsHandlerFactory->destroy(mUdfpsHandler);
+    }
     if (mDevice == nullptr) {
         ALOGE("No valid device");
         return;
@@ -238,12 +260,19 @@ Return<bool> BiometricsFingerprint::isUdfps(uint32_t /*sensorId*/) {
     return mIsUdfps;
 }
 
-Return<void> BiometricsFingerprint::onFingerDown(uint32_t /*x*/, uint32_t /*y*/, float /*minor*/,
-                                                 float /*major*/) {
+Return<void> BiometricsFingerprint::onFingerDown(uint32_t x, uint32_t y, float minor, float major) {
+    if (mUdfpsHandler) {
+        mUdfpsHandler->onFingerDown(x, y, minor, major);
+    }
+
     return Void();
 }
 
 Return<void> BiometricsFingerprint::onFingerUp() {
+    if (mUdfpsHandler) {
+        mUdfpsHandler->onFingerUp();
+    }
+
     return Void();
 }
 
