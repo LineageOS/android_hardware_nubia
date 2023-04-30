@@ -81,7 +81,11 @@ static uint32_t getBrightness(const HwLightState& state) {
 }
 
 static inline uint32_t scaleBrightness(uint32_t brightness, uint32_t maxBrightness) {
-    return brightness * maxBrightness / 0xFF;
+    // Map brightness values logarithmatically to match aosp behaviour
+    LOG(DEBUG) << "Received brightness: " << brightness;
+    if (maxBrightness == MAX_LCD_BRIGHTNESS)
+        return brightness_table[brightness];
+    return brightness;
 }
 
 static inline uint32_t getScaledBrightness(const HwLightState& state, uint32_t maxBrightness) {
