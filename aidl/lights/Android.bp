@@ -5,10 +5,10 @@
 //
 
 cc_binary {
-    name: "android.hardware.lights-service.example",
+    name: "android.hardware.lights-service.nubia",
     relative_install_path: "hw",
-    init_rc: ["lights-default.rc"],
-    vintf_fragments: ["lights-default.xml"],
+    init_rc: ["android.hardware.lights-service.nubia.rc"],
+    vintf_fragments: ["android.hardware.lights-service.nubia.xml"],
     vendor: true,
     shared_libs: [
         "libbase",
