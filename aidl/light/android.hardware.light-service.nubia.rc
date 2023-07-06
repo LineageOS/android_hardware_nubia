@@ -1,0 +1,15 @@
+on boot
+    chown system system /sys/class/leds/nubia_led/brightness
+    chown system system /sys/class/leds/nubia_led/fade_parameter
+    chown system system /sys/class/leds/nubia_led/grade_parameter
+    chown system system /sys/class/leds/nubia_led/outn
+    chown system system /sys/class/leds/nubia_led/blink_mode
+    chown system system /sys/class/leds/nubia_led/debug
+    chown system system /sys/class/leds/vibrator/debug
+
+service vendor.light-default /vendor/bin/hw/android.hardware.light-service.nubia
+    class hal
+    user system
+    group system
+    # shutting off lights while powering-off
+    shutdown critical
