@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#define LOG_TAG "lineage.touch@1.0-service.nx659j"
+#define LOG_TAG "lineage.touch@1.0-service.nubia"
 
 #include <android-base/logging.h>
 #include <hidl/HidlTransportSupport.h>
