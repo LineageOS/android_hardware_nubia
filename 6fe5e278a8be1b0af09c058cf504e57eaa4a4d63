@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d1caf2c_217aa3b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 18106
+      },
+      "writtenOn": "2023-07-24T21:46:30Z",
+      "side": 1,
+      "message": "I\u0027d rather give correct authorship at least on this HAL since it\u0027s one single commit for the import, and then apply the rest on top, also possibly not having to add a new commit on top to rename the hal to nubia. \nWill do it myself soon anyway, probably rebasing the chain",
+      "revId": "6fe5e278a8be1b0af09c058cf504e57eaa4a4d63",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
