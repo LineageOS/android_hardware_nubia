@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97667e0c_505abb98",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 24457
+      },
+      "writtenOn": "2023-07-24T11:47:26Z",
+      "side": 1,
+      "message": "First, we need to separate the RGB LED/Light strip/Logo Led. Secondly, we only need to define backlight for lcd devices (oled devices don\u0027t need to be specially defined on the hal side). Finally, for old RGB LED devices (create nodes under /sys/class/leds/nubia_led/ to define colors, modes or intervals), special handling is also required. Don\u0027t merge commits related to light hal yet, I\u0027ll take care of that soon.",
+      "revId": "1a28f7b85e34e9c59cf566ea4247e27c1baffb8f",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
