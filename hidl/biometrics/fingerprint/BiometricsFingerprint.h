@@ -63,7 +63,7 @@ struct BiometricsFingerprint : public IBiometricsFingerprint {
     Return<void> onFingerUp() override;
 
   private:
-    static fingerprint_device_t* openHal(const char* class_name);
+    static fingerprint_device_t* openHal(const char* id_name, const char* class_name);
     static void notify(
             const fingerprint_msg_t* msg); /* Static callback for legacy HAL implementation */
     static Return<RequestStatus> ErrorFilter(int32_t error);

@@ -20,13 +20,14 @@
 namespace {
 
 typedef struct fingerprint_hal {
+    const char* id_name;
     const char* class_name;
     const bool is_udfps;
 } fingerprint_hal_t;
 
 static const fingerprint_hal_t kModules[] = {
-        {"fpc", false}, {"goodix", false}, {"goodix_fod", true},
-        {"silead", false}, {"sunwave", false},
+        {"fingerprint", "fpc", false}, {"fingerprint", "goodix", false}, {"fingerprint", "goodix_fod", true},
+        {"fingerprint", "silead", false}, {"fingerprint.silead", "spec", false}, {"fingerprint", "sunwave", false},
 };
 
 }  // anonymous namespace
@@ -48,14 +49,14 @@ BiometricsFingerprint* BiometricsFingerprint::sInstance = nullptr;
 
 BiometricsFingerprint::BiometricsFingerprint() : mClientCallback(nullptr), mDevice(nullptr) {
     sInstance = this;  // keep track of the most recent instance
-    for (auto& [class_name, is_udfps] : kModules) {
-        mDevice = openHal(class_name);
+    for (auto& [id_name, class_name, is_udfps] : kModules) {
+        mDevice = openHal(id_name, class_name);
         if (!mDevice) {
-            ALOGE("Can't open HAL module, class %s", class_name);
+            ALOGE("Can't open HAL module, id %s, class %s", id_name, class_name);
             continue;
         }
 
-        ALOGI("Opened fingerprint HAL, class %s", class_name);
+        ALOGI("Opened fingerprint HAL, id %s, class %s", id_name, class_name);
         mIsUdfps = is_udfps;
         break;
     }
@@ -253,11 +254,11 @@ IBiometricsFingerprint* BiometricsFingerprint::getInstance() {
     return sInstance;
 }
 
-fingerprint_device_t* BiometricsFingerprint::openHal(const char* class_name) {
+fingerprint_device_t* BiometricsFingerprint::openHal(const char* id_name, const char* class_name) {
     int err;
     const hw_module_t* hw_mdl = nullptr;
     ALOGD("Opening fingerprint hal library...");
-    if (0 != (err = hw_get_module_by_class(FINGERPRINT_HARDWARE_MODULE_ID, class_name, &hw_mdl))) {
+    if (0 != (err = hw_get_module_by_class(id_name, class_name, &hw_mdl)))  {
         ALOGE("Can't open fingerprint HW Module, error: %d", err);
         return nullptr;
     }
