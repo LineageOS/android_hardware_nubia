@@ -172,6 +172,10 @@ static void handleNotification(const HwLightState& state) {
             if (!!blue)
                 set(LED_NODE RGB_LED_BLUE LED_DELAY_ON, state.flashOnMs);
                 set(LED_NODE RGB_LED_BLUE LED_DELAY_OFF, state.flashOffMs);
+            set(LED_NODE NUBIA_LED LED_COLOR, COLOR_GREEN);
+            set(LED_NODE NUBIA_LED LED_FADE, "3 0 4");
+            set(LED_NODE NUBIA_LED LED_GRADE, "0 100");
+            set(LED_NODE NUBIA_LED LED_BLINK_MODE, BLINK_ON);
             break;
         case FlashMode::NONE:
         default:
@@ -180,14 +184,23 @@ static void handleNotification(const HwLightState& state) {
                 set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, red);
                 set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, blue);
+                set(LED_NODE NUBIA_LED LED_COLOR, COLOR_RED);
+                set(LED_NODE NUBIA_LED LED_FADE, "0 0 0");
+                set(LED_NODE NUBIA_LED LED_GRADE, "100 255");
+                set(LED_NODE NUBIA_LED LED_BLINK_MODE, BLINK_CONST);
             } else if (battery_state == BATTERY_FULL) {
                 set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, green);
                 set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, blue);
+                set(LED_NODE NUBIA_LED LED_COLOR, COLOR_GREEN);
+                set(LED_NODE NUBIA_LED LED_FADE, "0 0 0");
+                set(LED_NODE NUBIA_LED LED_GRADE, "100 255");
+                set(LED_NODE NUBIA_LED LED_BLINK_MODE, BLINK_CONST);
             } else if (battery_state == BATTERY_FREE) {
                 set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, 0);
+                set(LED_NODE NUBIA_LED LED_BRIGHTNESS, 0);
             }
             break;
     }
