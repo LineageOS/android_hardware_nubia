@@ -91,35 +91,39 @@ BiometricsFingerprint::BiometricsFingerprint() : mClientCallback(nullptr), mDevi
     }
     if (!mDevice) {
         ALOGE("Can't open any HAL module");
-        return;
-    }
-
-    mGoodixFingerprintDaemon = IGoodixFingerprintDaemon::getService();
-
-    std::thread([this]() {
-        int fd = open(FOD_UI_PATH, O_RDONLY);
-        if (fd < 0) {
-            ALOGE("failed to open fd, err: %d", fd);
+        if (strcmp(mIsUdfps ? "true" : "false", "true") == 0) {
             return;
         }
+    }
 
-        struct pollfd fodUiPoll = {
-            .fd = fd,
-            .events = POLLERR | POLLPRI,
-            .revents = 0,
-        };
+    if (strcmp(mIsUdfps ? "true" : "false", "true") == 0) {
+        mGoodixFingerprintDaemon = IGoodixFingerprintDaemon::getService();
 
-        while (true) {
-            int rc = poll(&fodUiPoll, 1, -1);
-            if (rc < 0) {
-                ALOGE("failed to poll fd, err: %d", rc);
-                continue;
+        std::thread([this]() {
+            int fd = open(FOD_UI_PATH, O_RDONLY);
+            if (fd < 0) {
+                ALOGE("failed to open fd, err: %d", fd);
+                return;
             }
 
-            mGoodixFingerprintDaemon->sendCommand(readBool(fd) ? NOTIFY_FINGER_DOWN
-                : NOTIFY_FINGER_UP, {}, [](int, const hidl_vec<signed char>&) {});
-        }
-    }).detach();
+            struct pollfd fodUiPoll = {
+                .fd = fd,
+                .events = POLLERR | POLLPRI,
+                .revents = 0,
+            };
+
+            while (true) {
+                int rc = poll(&fodUiPoll, 1, -1);
+                if (rc < 0) {
+                    ALOGE("failed to poll fd, err: %d", rc);
+                    continue;
+                }
+
+                mGoodixFingerprintDaemon->sendCommand(readBool(fd) ? NOTIFY_FINGER_DOWN
+                    : NOTIFY_FINGER_UP, {}, [](int, const hidl_vec<signed char>&) {});
+            }
+        }).detach();
+    }
 }
 
 BiometricsFingerprint::~BiometricsFingerprint() {
