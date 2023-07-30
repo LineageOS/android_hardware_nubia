@@ -161,6 +161,7 @@ static void handleNotification(const HwLightState& state) {
         case FlashMode::HARDWARE:
         case FlashMode::TIMED:
             set(LED_NODE AW22XX_LED LED_EFFECT, LED_NOTIFICATION);
+            set(LED_NODE RGB_LED_BLUE LED_BREATH_FEATURE, LOGO_LED_BREATH);
             /* Enable blinking */
             if (!!red)
                 set(LED_NODE RGB_LED_RED LED_DELAY_ON, state.flashOnMs);
@@ -190,6 +191,7 @@ static void handleNotification(const HwLightState& state) {
                 set(LED_NODE NUBIA_LED LED_GRADE, "100 255");
                 set(LED_NODE NUBIA_LED LED_BLINK_MODE, BLINK_CONST);
                 set(LED_NODE AW22XX_LED LED_EFFECT, LED_BATTERY_CHARGING);
+                set(LED_NODE RGB_LED_BLUE LED_BREATH_FEATURE, LOGO_LED_ON);
             } else if (battery_state == BATTERY_FULL) {
                 set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, green);
@@ -199,12 +201,14 @@ static void handleNotification(const HwLightState& state) {
                 set(LED_NODE NUBIA_LED LED_GRADE, "100 255");
                 set(LED_NODE NUBIA_LED LED_BLINK_MODE, BLINK_CONST);
                 set(LED_NODE AW22XX_LED LED_EFFECT, LED_BATTERY_FULL);
+                set(LED_NODE RGB_LED_BLUE LED_BREATH_FEATURE, LOGO_LED_ON);
             } else if (battery_state == BATTERY_FREE) {
                 set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, 0);
                 set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, 0);
                 set(LED_NODE NUBIA_LED LED_BRIGHTNESS, 0);
                 set(LED_NODE AW22XX_LED LED_EFFECT, LED_OFF);
+                set(LED_NODE RGB_LED_BLUE LED_BREATH_FEATURE, LOGO_LED_OFF);
             }
             break;
     }
