@@ -29,6 +29,7 @@ typedef struct fingerprint_hal {
 static const fingerprint_hal_t kModules[] = {
         {"fingerprint", "fpc", false}, {"fingerprint", "goodix", false}, {"fingerprint", "goodix_fod", true},
         {"fingerprint", "silead", false}, {"fingerprint.silead", "spec", false}, {"fingerprint", "sunwave", false},
+        {"fingerprint", nullptr, true},
 };
 
 }  // anonymous namespace
@@ -63,9 +64,11 @@ BiometricsFingerprint::BiometricsFingerprint()
             continue;
         }
 
-        ALOGI("Opened fingerprint HAL, id %s, class %s", id_name, class_name);
+        if (class_name != nullptr) {
+            ALOGI("Opened fingerprint HAL, id %s, class %s", id_name, class_name);
+            SetProperty("persist.vendor.sys.fp.vendor", class_name);
+        }
         mIsUdfps = is_udfps;
-        SetProperty("persist.vendor.sys.fp.vendor", class_name);
         break;
     }
     if (!mDevice) {
@@ -296,9 +299,17 @@ fingerprint_device_t* BiometricsFingerprint::openHal(const char* id_name, const 
     int err;
     const hw_module_t* hw_mdl = nullptr;
     ALOGD("Opening fingerprint hal library...");
-    if (0 != (err = hw_get_module_by_class(id_name, class_name, &hw_mdl)))  {
-        ALOGE("Can't open fingerprint HW Module, error: %d", err);
-        return nullptr;
+
+    if (class_name == nullptr) {
+        if (0 != (err = hw_get_module(id_name, &hw_mdl))) {
+            ALOGE("Can't open fingerprint HW Module, error: %d", err);
+            return nullptr;
+        }
+    } else {
+        if (0 != (err = hw_get_module_by_class(id_name, class_name, &hw_mdl)))  {
+            ALOGE("Can't open fingerprint HW Module, error: %d", err);
+            return nullptr;
+        }
     }
 
     if (hw_mdl == nullptr) {
