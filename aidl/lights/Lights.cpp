@@ -9,6 +9,21 @@
 #include <android-base/logging.h>
 #include <fstream>
 
+#define BATTERY_CAPACITY            "/sys/class/power_supply/battery/capacity"
+#define BATTERY_STATUS_FILE         "/sys/class/power_supply/battery/status"
+
+#define BATTERY_STATUS_CHARGING     "Charging"
+#define BATTERY_STATUS_DISCHARGING  "Discharging"
+#define BATTERY_STATUS_FULL         "Full"
+
+enum battery_status {
+    BATTERY_UNKNOWN = 0,
+    BATTERY_LOW,
+    BATTERY_FREE,
+    BATTERY_CHARGING,
+    BATTERY_FULL,
+};
+
 namespace {
 /*
  * Write value to path and close file.
@@ -54,6 +69,44 @@ static int readStr(std::string path, char *buffer, size_t size)
 
 static void set(std::string path, int value) {
     set(path, std::to_string(value));
+}
+
+int getBatteryStatus()
+{
+    int err;
+
+    char status_str[16];
+    int capacity = 0;
+
+    err = readStr(BATTERY_STATUS_FILE, status_str, sizeof(status_str));
+    if (err <= 0) {
+        LOG(WARNING) << "failed to read battery status: " << err;
+        return BATTERY_UNKNOWN;
+    }
+
+    capacity = get(BATTERY_CAPACITY);
+
+    if (0 == strncmp(status_str, BATTERY_STATUS_FULL, 4)) {
+            return BATTERY_FULL;
+        }
+
+    if (0 == strncmp(status_str, BATTERY_STATUS_DISCHARGING, 11)) {
+            return BATTERY_FREE;
+        }
+
+    if (0 == strncmp(status_str, BATTERY_STATUS_CHARGING, 8)) {
+        if (capacity < 90) {
+            return BATTERY_CHARGING;
+        } else {
+            return BATTERY_FULL;
+        }
+    } else {
+        if (capacity < 10) {
+            return BATTERY_LOW;
+        } else {
+            return BATTERY_FREE;
+        }
+    }
 }
 
 #if defined(LCD_NODE)
