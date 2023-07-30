@@ -152,6 +152,46 @@ static void handleBacklight(const HwLightState& state) {
 #endif
 
 static void handleNotification(const HwLightState& state) {
+    uint32_t brightness = (state.color >> 24) & 0xFF;
+    uint32_t red = ((state.color >> 16) & 0xFF) * brightness / 0xFF;
+    uint32_t green = ((state.color >> 8) & 0xFF) * brightness / 0xFF;
+    uint32_t blue = (state.color & 0xFF) * brightness / 0xFF;
+
+    switch (state.flashMode) {
+        case FlashMode::HARDWARE:
+        case FlashMode::TIMED:
+            /* Enable blinking */
+            if (!!red)
+                set(LED_NODE RGB_LED_RED LED_DELAY_ON, state.flashOnMs);
+                set(LED_NODE RGB_LED_RED LED_DELAY_OFF, state.flashOffMs);
+
+            if (!!green)
+                set(LED_NODE RGB_LED_GREEN LED_DELAY_ON, state.flashOnMs);
+                set(LED_NODE RGB_LED_GREEN LED_DELAY_OFF, state.flashOffMs);
+
+            if (!!blue)
+                set(LED_NODE RGB_LED_BLUE LED_DELAY_ON, state.flashOnMs);
+                set(LED_NODE RGB_LED_BLUE LED_DELAY_OFF, state.flashOffMs);
+            break;
+        case FlashMode::NONE:
+        default:
+	    int battery_state = getBatteryStatus();
+	    if (battery_state == BATTERY_CHARGING || battery_state == BATTERY_LOW) {
+                set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, 0);
+                set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, red);
+                set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, blue);
+            } else if (battery_state == BATTERY_FULL) {
+                set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
+                set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, green);
+                set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, blue);
+            } else if (battery_state == BATTERY_FREE) {
+                set(LED_NODE RGB_LED_RED LED_BRIGHTNESS, 0);
+                set(LED_NODE RGB_LED_GREEN LED_BRIGHTNESS, 0);
+                set(LED_NODE RGB_LED_BLUE LED_BRIGHTNESS, 0);
+            }
+            break;
+    }
+    return;
 }
 
 /* Keep sorted in the order of importance. */
