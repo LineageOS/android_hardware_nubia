@@ -11,6 +11,7 @@
 #include <hardware/hardware.h>
 #include <hardware/lights.h>
 #include <vector>
+#include "nubia_lights.h"
 
 using ::aidl::android::hardware::light::HwLightState;
 using ::aidl::android::hardware::light::HwLight;
