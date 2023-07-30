@@ -56,6 +56,17 @@ static void set(std::string path, int value) {
     set(path, std::to_string(value));
 }
 
+static void handleNotification(const HwLightState& state) {
+}
+
+/* Keep sorted in the order of importance. */
+static std::vector<LightType> backends = {
+    LightType::ATTENTION,
+    LightType::BACKLIGHT,
+    LightType::BATTERY,
+    LightType::NOTIFICATIONS,
+};
+
 }  // anonymous namespace
 
 namespace aidl {
@@ -65,11 +76,37 @@ namespace light {
 
 ndk::ScopedAStatus Lights::setLightState(int id, const HwLightState& state) {
     LOG(INFO) << "Lights setting state for id=" << id << " to color " << std::hex << state.color;
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    switch(id) {
+        case (int) LightType::ATTENTION:
+            handleNotification(state);
+            return ndk::ScopedAStatus::ok();
+        case (int) LightType::BACKLIGHT:
+            handleBacklight(state);
+            return ndk::ScopedAStatus::ok();
+        case (int) LightType::BATTERY:
+            handleNotification(state);
+            return ndk::ScopedAStatus::ok();
+        case (int) LightType::NOTIFICATIONS:
+            handleNotification(state);
+            return ndk::ScopedAStatus::ok();
+        default:
+            return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+    }
 }
 
 ndk::ScopedAStatus Lights::getLights(std::vector<HwLight>* lights) {
     LOG(INFO) << "Lights reporting supported lights";
+    int i = 0;
+
+    for (const LightType& backend : backends) {
+        HwLight hwLight;
+        hwLight.id = (int) backend;
+        hwLight.type = backend;
+        hwLight.ordinal = i;
+        lights->push_back(hwLight);
+        i++;
+    }
+
     return ndk::ScopedAStatus::ok();
 }
 
