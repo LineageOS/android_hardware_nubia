@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9c0e0f8_341b438e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 18106
+      },
+      "writtenOn": "2023-08-01T11:47:06Z",
+      "side": 1,
+      "message": "I think if we really want to go for a common implementation, it could make more sense to use udfpshandler and device specific libraries to send FOD commands and everything, simply because even if right now we don\u0027t need it, it might be easier to support more devices in the future this way.",
+      "revId": "b446c99814ec62c5eca028e193cdf1ad0e70c1b6",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    }
+  ]
+}
